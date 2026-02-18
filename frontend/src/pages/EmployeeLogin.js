@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 
 function EmployeeLogin() {
   const [employees, setEmployees] = useState([]);
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedEmail, setSelectedEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,27 +16,22 @@ function EmployeeLogin() {
   }, []);
 
   const handleLogin = async () => {
-    if (!selectedId) {
-      toast.error("Please select an employee");
+    if (!selectedEmail || !password) {
+      toast.error("Enter both email and password");
       return;
     }
 
-    const selectedEmployee = employees.find(emp => emp.id === parseInt(selectedId));
-
     try {
       const res = await axios.post("http://localhost:8000/employee/login", {
-        email: selectedEmployee.email, // Use the actual email
-        password: "password123"        // Use default password
+        email: selectedEmail,
+        password: password 
       });
 
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("role", "employee");
-      localStorage.setItem("employee_id", selectedId);
-
+      localStorage.setItem("employee_id", res.data.employee_id);
       toast.success("Login successful!");
-      navigate(`/employee/dashboard/${selectedId}`);
+      navigate(`/employee/dashboard/${res.data.employee_id}`);
     } catch (error) {
-      toast.error("Login failed: " + (error.response?.data?.detail || "Error"));
+      toast.error("Login failed: Invalid credentials");
     }
   };
 
@@ -43,12 +39,18 @@ function EmployeeLogin() {
     <div style={styles.wrapper}>
       <div style={styles.card}>
         <h2 style={styles.title}>Employee Login</h2>
-        <select style={styles.select} value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
-          <option value="">Select Employee</option>
+        <select style={styles.select} onChange={(e) => setSelectedEmail(e.target.value)}>
+          <option value="">Select Account</option>
           {employees.map((emp) => (
-            <option key={emp.id} value={emp.id}>{emp.name}</option>
+            <option key={emp.id} value={emp.email}>{emp.name}</option>
           ))}
         </select>
+        <input 
+          type="password" 
+          placeholder="Enter Password" 
+          style={styles.select} 
+          onChange={(e) => setPassword(e.target.value)} 
+        />
         <button style={styles.button} onClick={handleLogin}>Login</button>
       </div>
     </div>

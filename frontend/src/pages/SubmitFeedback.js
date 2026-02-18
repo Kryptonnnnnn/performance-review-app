@@ -18,7 +18,7 @@ function SubmitFeedback() {
       });
 
       alert("Feedback Submitted Successfully");
-      // Navigates back to specific employee dashboard
+      
       const empId = localStorage.getItem("employee_id");
       navigate(`/employee/dashboard/${empId}`);
     } catch (error) {
